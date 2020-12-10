@@ -6,7 +6,7 @@
 
 import requests
 from bs4 import BeautifulSoup
-import pyodbc
+# import pyodbc
 
 # setup database
 # driver = '{MySQL ODBC 8.0 ANSI Driver}'
@@ -49,7 +49,6 @@ Since = []  # 時間
 
 # 有下載檔案才需要
 FileName, UploadDate, FileURL = [], [], []
-
 for index, url in enumerate(articleURL):
     response = requests.get(url)
     response.encoding = 'utf8'
@@ -64,19 +63,23 @@ for index, url in enumerate(articleURL):
     Author.append(anounce_title[5].findNext().text)
     Since.append(anounce_title[6].findNext().text)
 
-    # cursor.execute('call xp_insertarticle(4, ?,?,?,?,?,?,?,?)',
-    #                articleURL[index], Title[index], URL[index], Content[index],
-    #                Type[index], Status[index], Author[index], Since[index])
+    check_duplicate_url_title = Title[index]
+    check_duplicate_url_since = Since[index]
+    check_duplicate_url = f'https://www.tuuuna.com/api/searchtitle?title={check_duplicate_url_title}&since={check_duplicate_url_since}'
+    if not requests.get(check_duplicate_url).text:
+        # cursor.execute('call xp_insertarticle(4, ?,?,?,?,?,?,?,?)',
+        #                articleURL[index], Title[index], URL[index], Content[index],
+        #                Type[index], Status[index], Author[index], Since[index])
 
-    if soup.find_all('td')[-1].text != '未查詢到任何相關資料！！':
-        FileName = [i for i in soup.find_all('th')[-1].find_next().find_next().find_next().text.split('\n') if i]
-        UploadDate = [s.text for i, s in enumerate(soup.find_all('th')[-1].find_next().find_next().find_next().find_all('td')) if i%3 == 1]
-        FileURL = [csie + i.find_all('a')[0].get('href') for i in soup.find_all('td') if i.find_all('a')]
-        print(FileName)
-        print(UploadDate)
-        print(FileURL)
-        print()
-        # xp_insertFile(AID, FileName, UploadDate, FileURL)
+        if soup.find_all('td')[-1].text != '未查詢到任何相關資料！！':
+            FileName = [i for i in soup.find_all('th')[-1].find_next().find_next().find_next().text.split('\n') if i]
+            UploadDate = [s.text for i, s in enumerate(soup.find_all('th')[-1].find_next().find_next().find_next().find_all('td')) if i%3 == 1]
+            FileURL = [csie + i.find_all('a')[0].get('href') for i in soup.find_all('td') if i.find_all('a')]
+            print(FileName)
+            print(UploadDate)
+            print(FileURL)
+            print()
+            # xp_insertFile(AID, FileName, UploadDate, FileURL)
 
 # cursor.close()
 # cnxn.close()
