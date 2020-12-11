@@ -7,9 +7,9 @@
 import requests
 from bs4 import BeautifulSoup
 import time
-import pyodbc
+# import pyodbc
 
-while 1:
+while True:
     # setup database
     driver = '{MySQL ODBC 8.0 ANSI Driver}'
     server = '3.113.101.0'
@@ -102,4 +102,4 @@ while 1:
     except Exception as e:
         print(e)
 
-    time.sleep(300)
+    # time.sleep(300)
