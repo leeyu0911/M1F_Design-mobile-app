@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 # coding=utf-8
 # pip install beautifulsoup4
 # pip install requests
@@ -15,18 +9,19 @@ from bs4 import BeautifulSoup
 import time
 import pyodbc
 
-count = 0
 
-while 1:
+count = 0
+while True:
     count = count + 1
     print('#', count)
+
+
     # setup database
     driver = '{MySQL ODBC 8.0 ANSI Driver}'
     server = '3.113.101.0'
     database = 'subscriptApp'
     username = 'appguest'
     password = 'appguest123'
-
     try:
         cnxn = pyodbc.connect(Driver='{MySQL ODBC 8.0 ANSI Driver}',
                               Server=server, Database=database, Uid=username, Pwd=password)
@@ -34,6 +29,7 @@ while 1:
     except Exception as e:
         print('connect sql fail')
         print(e)
+
 
     # get NCKU CSIE web announces
     csie = 'http://www.csie.ncku.edu.tw'
@@ -49,7 +45,7 @@ while 1:
         articleURL = []  # 網址
 
         for i in range(len(web_announces)):
-            # if i%2 == 0:
+            # if i % 2 == 0:
             #     Since.append(web_anounces[i].text)
             if i % 2 == 1:
                 temp = web_announces[i].text.split('\xa0\xa0')  # ['一般', '[徵才公告]  AWS 2021校園招募']
@@ -57,16 +53,21 @@ while 1:
                 Title.append(temp[1])
                 articleURL.append(csie + web_announces[i].find('a')['href'])
 
+        # 反轉順序
+        Status.reverse()
+        Title.reverse()
+        articleURL.reverse()
+
+
+        # 每個通知進去該網頁抓內容
         URL = []  # 資料連結
         Content = []  # 公告內容
         Type = []  # 公告類型
         Author = []  # 公告人員
         Since = []  # 時間
+        FileName, UploadDate, FileURL = [], [], []  # 附加檔案
 
-
-        # 有下載檔案才需要
-        FileName, UploadDate, FileURL = [], [], []
-        for index, url in reversed(list(enumerate((articleURL)))):
+        for index, url in enumerate(articleURL):
             response = requests.get(url)
             response.encoding = 'utf8'
 
@@ -88,25 +89,30 @@ while 1:
                 myaid = 0
                 print('新資料插入')
                 try:
-                    cursor.execute('call xp_insertarticle(4, ?,?,?,?,?,?,?,?)', str(articleURL[index]), str(Title[index]), str(URL[index]), str(Content[index]), str(Type[index]), str(Status[index]), str(Author[index]), str(Since[index]))
+                    cursor.execute('call xp_insertarticle(4, ?,?,?,?,?,?,?,?)',
+                                   str(articleURL[index]), str(Title[index]), str(URL[index]),
+                                   str(Content[index]), str(Type[index]), str(Status[index]),
+                                   str(Author[index]), str(Since[index]))
                     for i in cursor:
                         myaid = i[0]
                         break
                     print(myaid)
-                
                 except Exception as e:
                     print('insertarticle fail')
                     print(e)
-                # 加入下載文件
+
+                # 資料庫加入下載文件
                 if soup.find_all('td')[-1].text != '未查詢到任何相關資料！！':
                     FileName = [i for i in soup.find_all('th')[-1].find_next().find_next().find_next().text.split('\n') if i]
-                    UploadDate = [s.text for i, s in enumerate(soup.find_all('th')[-1].find_next().find_next().find_next().find_all('td')) if i%3 == 1]
+                    UploadDate = [s.text for i, s in enumerate(soup.find_all('th')[-1].find_next().find_next().find_next().find_all('td')) if i % 3 == 1]
                     FileURL = [csie + i.find_all('a')[0].get('href') for i in soup.find_all('td') if i.find_all('a')]
                     print(FileName, UploadDate, FileURL)
                     
                     for i in range(len(FileName)):
                         try:
-                            cursor.execute('call xp_insertFile(?,?,?,?)', int(myaid), str(FileName[i]), str(UploadDate[i]), str(FileURL[i]))
+                            cursor.execute('call xp_insertFile(?,?,?,?)',
+                                           int(myaid), str(FileName[i]),
+                                           str(UploadDate[i]), str(FileURL[i]))
                             cursor.commit()
                         except Exception as e:
                             print('insertfile fail')
