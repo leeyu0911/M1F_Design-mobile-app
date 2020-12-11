@@ -66,7 +66,7 @@ while 1:
 
         # 有下載檔案才需要
         FileName, UploadDate, FileURL = [], [], []
-        for index, url in enumerate(articleURL):
+        for index, url in enumerate(reversed(articleURL)):
             response = requests.get(url)
             response.encoding = 'utf8'
 
@@ -83,6 +83,7 @@ while 1:
             check_duplicate_url_title = Title[index]
             check_duplicate_url_since = Since[index]
             check_duplicate_url = f'https://www.tuuuna.com/api/searchtitle?title={check_duplicate_url_title}&since={check_duplicate_url_since}'
+            # 驗證該筆資料是否存在資料庫中
             if requests.get(check_duplicate_url).text == '[]':
                 myaid = 0
                 print('新資料插入')
@@ -96,7 +97,7 @@ while 1:
                 except Exception as e:
                     print('insertarticle fail')
                     print(e)
-
+                # 加入下載文件
                 if soup.find_all('td')[-1].text != '未查詢到任何相關資料！！':
                     FileName = [i for i in soup.find_all('th')[-1].find_next().find_next().find_next().text.split('\n') if i]
                     UploadDate = [s.text for i, s in enumerate(soup.find_all('th')[-1].find_next().find_next().find_next().find_all('td')) if i%3 == 1]
