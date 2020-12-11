@@ -66,7 +66,7 @@ while 1:
 
         # 有下載檔案才需要
         FileName, UploadDate, FileURL = [], [], []
-        for index, url in enumerate(reversed(articleURL)):
+        for index, url in reversed(list(enumerate((articleURL)))):
             response = requests.get(url)
             response.encoding = 'utf8'
 
