@@ -68,10 +68,11 @@ for index, url in enumerate(articleURL):
     Author.append(anounce_title[5].findNext().text)
     Since.append(anounce_title[6].findNext().text)
 
+    # Confirm whether the data is in the database
     check_duplicate_url_title = Title[index]
     check_duplicate_url_since = Since[index]
     check_duplicate_url = f'https://www.tuuuna.com/api/searchtitle?title={check_duplicate_url_title}&since={check_duplicate_url_since}'
-    if requests.get(check_duplicate_url).text == '[]':
+    if requests.get(check_duplicate_url).text != '[]':
         myaid = 0
         # feedback_from_sql = cursor.execute('call xp_insertarticle(4, ?,?,?,?,?,?,?,?)',
         #                                    articleURL[index], Title[index], URL[index], Content[index],
@@ -83,8 +84,14 @@ for index, url in enumerate(articleURL):
             UploadDate = [s.text for i, s in
                           enumerate(soup.find_all('th')[-1].find_next().find_next().find_next().find_all('td')) if
                           i % 3 == 1]
-            FileURL = [csie + i.find_all('a')[0].get('href') for i in soup.find_all('td') if i.find_all('a')]
-            # for i in range(len(FileName)):
+            FileURL = [csie + i.find_all('a')[0].get('href') for i in soup.find_all('td') if i.find_all('a') and
+                       'http' not in i.find_all('a')[0].get('href')[:4]]
+            # print(FileName, UploadDate, FileURL)
+            for i in range(len(FileName)):
+                print(type(FileName[i]), FileName[i])
+                print(type(UploadDate[i]), UploadDate[i])
+                print(type(FileURL[i]), FileURL[i])
+                print()
                 # cursor.execute('call xp_insertFile(?,?,?,?)', myaid, FileName[i], UploadDate[i],
                 #                FileURL[i])
                 # cursor.commit()

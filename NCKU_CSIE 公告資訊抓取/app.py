@@ -105,7 +105,8 @@ while True:
                 if soup.find_all('td')[-1].text != '未查詢到任何相關資料！！':
                     FileName = [i for i in soup.find_all('th')[-1].find_next().find_next().find_next().text.split('\n') if i]
                     UploadDate = [s.text for i, s in enumerate(soup.find_all('th')[-1].find_next().find_next().find_next().find_all('td')) if i % 3 == 1]
-                    FileURL = [csie + i.find_all('a')[0].get('href') for i in soup.find_all('td') if i.find_all('a')]
+                    FileURL = [csie + i.find_all('a')[0].get('href') for i in soup.find_all('td') if i.find_all('a') and
+                               'http' not in i.find_all('a')[0].get('href')[:4]]
                     print(FileName, UploadDate, FileURL)
                     
                     for i in range(len(FileName)):
