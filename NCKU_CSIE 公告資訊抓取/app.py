@@ -76,7 +76,7 @@ while True:
 
             URL.append(anounce_title[1].findNext().text if anounce_title[1].findNext().text == '無'
                        else anounce_title[1].findNext().find('a').get('href'))
-            Content.append(str(anounce_title[2].findNext()))
+            Content.append(str(anounce_title[2].findNext()).replace('\xa0', ' '))
             Type.append(anounce_title[3].findNext().text)
             Author.append(anounce_title[5].findNext().text)
             Since.append(anounce_title[6].findNext().text)

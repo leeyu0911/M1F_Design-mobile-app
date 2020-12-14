@@ -63,7 +63,7 @@ for index, url in enumerate(articleURL):
 
     URL.append(anounce_title[1].findNext().text if anounce_title[1].findNext().text == '無'
                else anounce_title[1].findNext().find('a').get('href'))
-    Content.append(str(anounce_title[2].findNext()))
+    Content.append(str(anounce_title[2].findNext()).replace('\xa0', ' '))
     Type.append(anounce_title[3].findNext().text)
     Author.append(anounce_title[5].findNext().text)
     Since.append(anounce_title[6].findNext().text)
@@ -72,7 +72,9 @@ for index, url in enumerate(articleURL):
     check_duplicate_url_title = Title[index]
     check_duplicate_url_since = Since[index]
     check_duplicate_url = f'https://www.tuuuna.com/api/searchtitle?title={check_duplicate_url_title}&since={check_duplicate_url_since}'
-    if requests.get(check_duplicate_url).text != '[]':
+
+    # if requests.get(check_duplicate_url).text == '[]':  # 如果資料庫中沒有 才進入
+    if requests.get(check_duplicate_url).text != '[]':  # 如果資料庫中有 才進入
         myaid = 0
         # feedback_from_sql = cursor.execute('call xp_insertarticle(4, ?,?,?,?,?,?,?,?)',
         #                                    articleURL[index], Title[index], URL[index], Content[index],
