@@ -21,12 +21,6 @@ database = keys['database']
 username = keys['username']
 password = keys['password']
 
-try:
-    cnxn = pyodbc.connect(Driver=driver, Server=server, Database=database, Uid=username, Pwd=password)
-    cursor = cnxn.cursor()
-except Exception as e:
-    assert 0, str(e) + ' \nconnect sql fail...'
-
 
 # get NCKU CSIE web announces
 csie = 'http://www.csie.ncku.edu.tw'
@@ -35,6 +29,12 @@ url = csie + '/ncku_csie/announce/news/1000'
 
 count = 0
 while True:
+    try:
+        cnxn = pyodbc.connect(Driver=driver, Server=server, Database=database, Uid=username, Pwd=password)
+        cursor = cnxn.cursor()
+    except Exception as e:
+        assert 0, str(e) + ' \nconnect sql fail...'
+
     count = count + 1
     print('#', count)
 
@@ -137,6 +137,5 @@ while True:
     except Exception as e:
         print('something wrong')
         print(e)
-
     time.sleep(sleep_time)
 
