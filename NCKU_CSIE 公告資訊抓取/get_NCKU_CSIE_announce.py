@@ -59,8 +59,8 @@ Since = []  # 時間
 
 # 有下載檔案才需要
 FileName, UploadDate, FileURL = [], [], []
-for index, url in enumerate(articleURL):
-    response = requests.get(url)
+for index, uid in enumerate(articleURL):
+    response = requests.get(uid)
     response.encoding = 'utf8'
 
     soup = BeautifulSoup(response.text, "html.parser")

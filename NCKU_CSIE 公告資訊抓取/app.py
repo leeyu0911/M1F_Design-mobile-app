@@ -72,8 +72,8 @@ while True:
         Since = []  # 時間
         FileName, UploadDate, FileURL = [], [], []  # 附加檔案
 
-        for index, url in enumerate(articleURL):
-            response = requests.get(url)
+        for index, uid in enumerate(articleURL):
+            response = requests.get(uid)
             response.encoding = 'utf8'
 
             soup = BeautifulSoup(response.text, "html.parser")
