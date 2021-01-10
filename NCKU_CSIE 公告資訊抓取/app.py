@@ -20,6 +20,11 @@ server = keys['server']
 database = keys['database']
 username = keys['username']
 password = keys['password']
+try:
+    cnxn = pyodbc.connect(Driver=driver, Server=server, Database=database, Uid=username, Pwd=password)
+    cursor = cnxn.cursor()
+except Exception as e:
+    assert 0, str(e) + ' \nconnect sql fail...'
 
 
 # get NCKU CSIE web announces
@@ -29,15 +34,8 @@ url = csie + '/ncku_csie/announce/news/1000'
 
 count = 0
 while True:
-    try:
-        cnxn = pyodbc.connect(Driver=driver, Server=server, Database=database, Uid=username, Pwd=password)
-        cursor = cnxn.cursor()
-    except Exception as e:
-        assert 0, str(e) + ' \nconnect sql fail...'
-
     count = count + 1
     print('#', count)
-
 
     try:
         response = requests.get(url)
@@ -86,9 +84,9 @@ while True:
             Author.append(anounce_title[5].findNext().text)
             Since.append(anounce_title[6].findNext().text)
 
-            check_duplicate_url_title = Title[index]
+            # check_duplicate_url_title = Title[index]
             check_duplicate_url_since = Since[index]
-            check_duplicate_url = f'https://www.tuuuna.com/api/searchtitle?title={check_duplicate_url_title}&since={check_duplicate_url_since}'
+            check_duplicate_url = f'https://www.tuuuna.com/api/searchtitle?since={check_duplicate_url_since}'
             # 驗證該筆資料是否存在資料庫中
             if requests.get(check_duplicate_url).text == '[]':
                 myaid = 0
@@ -137,5 +135,6 @@ while True:
     except Exception as e:
         print('something wrong')
         print(e)
+
     time.sleep(sleep_time)
 
